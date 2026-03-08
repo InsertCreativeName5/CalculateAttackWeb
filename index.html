@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <title>Gen 4 Attack Calculator</title>
+    <link rel="stylesheet" href="style.css" />
+    <script data-require="jquery" data-semver="2.1.1" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <h1>Gen 4 Ironmon Attack Calculator</h1>
+    <form name="calcAttackForm" method="GET" action="">
+        <label for="damageTaken">Damage Taken:</label><br>
+        <input type="number" id="damageTaken" name="damageTaken" min="1"><br>
+        <label for="oppLevel">Opponent Level:</label><br>
+        <input type="number" id="oppLevel" name="oppLevel" min="1" value="5"><br>
+        <label for="defense">Your defense/Special Defense:</label><br>
+        <input type="number" id="defense" name="defense" min="1" value="1"><br>
+        <label for="movePower">Move Power:</label><br>
+        <input type="number" id="movePower" name="movePower" min="1" value="40"><br>
+        <label for="effMult">Effectiveness Multiplier:</label><br>
+        <input type="number" id="effMult" name="effMult" min="1" step="0.5" value="1"><br>
+        <label for="otherMult">Other Mult:</label><br>
+        <input type="number" id="otherMult" name="otherMult" min="1" step="0.01" value="1"><br>
+        <p>How did the weather impact?</p>
+        <input type="radio" id="weatherInc" name="weather" value="weatherInc">
+        <label for="weatherInc">Weather Increases Damage</label></br>
+        <input type="radio" id="weatherDec" name="weather" value="weatherDec">
+        <label for="weatherDec">Weather Decreases Damage</label></br>
+        <input type="radio" id="weatherNeut" name="weather" value="weatherNeut" checked>
+        <label for="weatherNeut">Weather is Neutral</label></br>
+        </br>
+        <input type="checkbox" id="stab" name="stab" value="STAB">
+        <label for="stab">STAB</label><br>
+        
+        <input type="checkbox" id="crit" name="crit" value="crit">
+        <label for="crit">Critical Hit</label><br>
+        
+        <input type="checkbox" id="burn" name="burn" value="burn">
+        <label for="burn">Burned and Physical Attack</label><br>
+        
+        <input type="checkbox" id="screen" name="screen" value="screen">
+        <label for="screen">Relevant Screen is up</label><br><br>
+        
+        
+        <input type="button" value="Submit" onClick="calcAttack(this.form)">
+        <input type="reset" value="Reset">
+        
+        <p>Lower Attack Value:</p>
+        <p id="lowAttack"></p>
+        
+        <p>Higher Attack Value:</p>
+        <p id="highAttack"></p>
+       
+    <script>
+        function calcAttack(form)
+        {
+            var damageTaken = Number(form.damageTaken.value);
+         
+            var opponentLevel = Number(form.oppLevel.value);
+         
+            var defense = Number(form.defense.value);
+            var power = Number(form.movePower.value);
+            
+            var effMultiplier = Number(form.effMult.value);
+            var otherMultiplier = Number(form.otherMult.value);
+            
+            var stab = form.stab.checked;
+            var mStab = stab ? 1.5 : 1.0;
+            var crit = form.crit.checked;
+            var mCrit = crit ? 2.0 : 1.0;
+            var burn = form.burn.checked;
+            var mBurn = burn ? 0.5 : 1.0;
+            var screen = form.screen.checked;
+            var mScreen = screen ? 0.5 : 1.0;
+            
+            var weather = form.weather.value;
+            
+            var weatherMult;
+            
+            if (weather == "weatherDec")
+            {
+                weatherMult = 0.5;
+            }
+            else if (weather == "weatherInc")
+            {
+                weatherMult = 1.5;
+            }
+            else
+            {
+                weatherMult = 1.0;
+            }
+            
+            var upperAttack = 0;
+            var lowerAttack = 999;
+            
+            for (let i = 1; i<255; ++i)
+            {
+                const [low, high] = formula(i, defense, power, opponentLevel, mBurn, mScreen, weatherMult, mCrit, mStab, effMultiplier, otherMultiplier);
+                
+                if (damageTaken >= low && damageTaken < high)
+                {
+                    if (i < lowerAttack)
+                    {
+                        lowerAttack = i;
+                    }
+                    if (i > upperAttack)
+                    {
+                        upperAttack = i;
+                    }
+                }
+            }
+            
+            document.getElementById("lowAttack").innerText = lowerAttack;
+            
+            document.getElementById("highAttack").innerText = upperAttack;
+        }
+        
+        
+        
+        function formula(attackGuess, defense, power, level, mBurn, mScreen, mWeather, mCritical, mSTAB, mType, mOther)
+        {
+            var part1 = Math.floor(Math.floor((2 * level / 5 + 2) * power * (attackGuess / defense)) / 50);
+            var part2 = part1 * mBurn * mScreen * mWeather + 1;
+            var part3 = part2 * mCritical * mSTAB * mType * mOther;
+            var low = Math.floor(part3 * 85/100);
+            var high = Math.floor(part3 * 100/100);
+            return [low, high];
+        }
+    </script>
+    
+    
+  </body>
+
+</html>
