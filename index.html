@@ -121,8 +121,8 @@
         
         function formula(attackGuess, defense, power, level, mBurn, mScreen, mWeather, mCritical, mSTAB, mType, mOther)
         {
-            var part1 = Math.floor(Math.floor((2 * level / 5 + 2) * power * (attackGuess / defense)) / 50);
-            var part2 = part1 * mBurn * mScreen * mWeather + 1;
+            var part1 = Math.floor(Math.floor(((2 * level / 5) + 2) * power * (attackGuess / defense)) / 50);
+            var part2 = part1 * mBurn * mScreen * mWeather + 2;
             var part3 = part2 * mCritical * mSTAB * mType * mOther;
             var low = Math.floor(part3 * 85/100);
             var high = Math.floor(part3 * 100/100);
