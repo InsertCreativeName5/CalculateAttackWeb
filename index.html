@@ -99,7 +99,7 @@
             {
                 const [low, high] = formula(i, defense, power, opponentLevel, mBurn, mScreen, weatherMult, mCrit, mStab, effMultiplier, otherMultiplier);
                 
-                if (damageTaken >= low && damageTaken < high)
+                if (damageTaken >= low && damageTaken <= high)
                 {
                     if (i < lowerAttack)
                     {
